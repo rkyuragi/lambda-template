@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_error_rate" {
 
   metric_query {
     id          = "error_rate"
-    expression  = "100 * (errors / MAX([invocations,1]))"
+    expression  = "IF(invocations > 0, 100 * (errors / invocations), 0)"
     label       = "ErrorRate(%)"
     return_data = true
   }
@@ -123,4 +123,3 @@ resource "aws_cloudwatch_metric_alarm" "lambda_error_rate" {
     }
   }
 }
-

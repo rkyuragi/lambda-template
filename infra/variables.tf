@@ -30,12 +30,17 @@ variable "ecr_repository_name" {
 }
 
 # Slack (Amazon Q Developer in chat applications)
-variable "slack_workspace_id" {
-  type = string # 例: "T0ABCDEF"
-}
-
 variable "slack_channel_id" {
   type = string # 例: "C0GHJKLMN"
+}
+
+variable "slack_team_id" {
+  type = string # 例: "T0ABCDEF"（Workspace/Team ID）
+}
+
+variable "manage_chatbot" {
+  type    = bool
+  default = true # 既存チャネル設定がある場合は false にして手動で SNS を追加 or import
 }
 
 # SNS
