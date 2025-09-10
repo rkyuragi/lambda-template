@@ -1,0 +1,62 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Node.js / TypeScript
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+.venv/
+venv/
+ENV/
+.env
+.env.*
+.mypy_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# AWS / Lambda tooling
+.aws-sam/
+.serverless/
+
+# Terraform / CDK (if present)
+.cdk.out/
+cdk.out/
+.terraform/
+terraform.tfstate*
+
+# Package managers cache
+.npm/
+.pnpm-store/
+.yarn-cache/
+
+# Misc
+*.bak
+*.tmp
+*.orig
+
+# Local overrides
+local.settings.json
