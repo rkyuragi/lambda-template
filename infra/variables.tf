@@ -66,10 +66,3 @@ variable "error_rate_threshold_percent" {
   default = 5
 }
 
-# アラーム通知の経路
-# true: EventBridge 経由で整形して SNS/Slack（CloudWatch アラーム側の通知は未設定に見える）
-# false: CloudWatch アラームの通知に SNS を直接設定（コンソール上で「通知あり」になる）
-variable "alarm_use_eventbridge_formatting" {
-  type    = bool
-  default = true
-}

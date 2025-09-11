@@ -9,13 +9,7 @@ resource "aws_sns_topic_policy" "alerts_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-      {
-        Sid      = "AllowEventBridgeToPublish",
-        Effect   = "Allow",
-        Principal = { Service = "events.amazonaws.com" },
-        Action   = ["SNS:Publish"],
-        Resource = aws_sns_topic.alerts.arn
-      },
+      // EventBridge 経由の配信は廃止のため許可を除去
       {
         Sid      = "AllowCloudWatchToPublish",
         Effect   = "Allow",

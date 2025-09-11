@@ -31,11 +31,4 @@ resource "aws_lambda_function" "this" {
 }
 
 # 非同期失敗を EventBridge 既定バスへ（OnFailure -> EventBridge）
-resource "aws_lambda_function_event_invoke_config" "async" {
-  function_name = aws_lambda_function.this.function_name
-  destination_config {
-    on_failure { destination = local.default_bus_arn }
-  }
-  maximum_retry_attempts       = 2
-  maximum_event_age_in_seconds = 21600
-}
+// 非同期の EventBridge 宛先（OnFailure）は不要のため削除済み

@@ -15,80 +15,12 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 
   dimensions = { FunctionName = var.lambda_function_name }
 
-  # 直接SNSへ通知する場合のみ設定（コンソール上で「通知あり」表示）
-  alarm_actions = var.alarm_use_eventbridge_formatting ? [] : [aws_sns_topic.alerts.arn]
+  # CloudWatch アラームから直接 SNS へ通知
+  alarm_actions = [aws_sns_topic.alerts.arn]
 }
 
-# アラーム状態遷移（ALARM）のイベントをキャッチ
-resource "aws_cloudwatch_event_rule" "cw_alarm_state_alarm" {
-  count        = var.alarm_use_eventbridge_formatting ? 1 : 0
-  name         = "${var.project}-cw-alarm-state"
-  description  = "CloudWatch Alarm State Change (ALARM only)"
-  event_pattern = jsonencode({
-    source      = ["aws.cloudwatch"],
-    detail-type = ["CloudWatch Alarm State Change"],
-    resources   = [aws_cloudwatch_metric_alarm.lambda_errors.arn],
-    detail      = { state = { value = ["ALARM"] } }
-  })
-}
 
-# Slack へ整形して通知（SNS ターゲット＋Input Transformer）
-resource "aws_cloudwatch_event_target" "cw_alarm_to_sns" {
-  count = var.alarm_use_eventbridge_formatting ? 1 : 0
-  rule  = aws_cloudwatch_event_rule.cw_alarm_state_alarm[0].name
-  arn   = aws_sns_topic.alerts.arn
-
-  input_transformer {
-    input_paths = {
-      alarmName = "$.detail.alarmName"
-      newState  = "$.detail.state.value"
-      reason    = "$.detail.state.reason"
-      time      = "$.time"
-      region    = "$.region"
-      account   = "$.account"
-    }
-    input_template = "\"*:rotating_light: Lambda失敗アラーム :rotating_light:*\\n*アラーム*: <alarmName>\\n*状態*: <newState>\\n*理由*: <reason>\\n*時刻*: <time>\\n*リージョン*: <region> / *アカウント*: <account>\\n<https://console.aws.amazon.com/cloudwatch/home?region=<region>#alarmsV2:alarm/<alarmName>|CloudWatch アラームを開く>\""
-  }
-}
-
-##############################################################
-# 2) 非同期失敗イベント（詳細ペイロード） -> Slack 整形通知
-##############################################################
-resource "aws_cloudwatch_event_rule" "lambda_async_failure" {
-  name        = "${var.project}-lambda-async-failure"
-  description = "Lambda Destinations OnFailure（非同期失敗）"
-  event_pattern = jsonencode({
-    source      = ["lambda"],
-    detail-type = ["Lambda Function Invocation Result - Failure"],
-    detail      = {
-      requestContext = {
-        functionArn = [
-          { prefix = "arn:aws:lambda:${var.region}:${local.account_id}:function:${var.lambda_function_name}" }
-        ]
-      }
-    }
-  })
-}
-
-resource "aws_cloudwatch_event_target" "lambda_async_failure_to_sns" {
-  rule = aws_cloudwatch_event_rule.lambda_async_failure.name
-  arn  = aws_sns_topic.alerts.arn
-
-  input_transformer {
-    input_paths = {
-      fnArn        = "$.detail.requestContext.functionArn"
-      reqId        = "$.detail.requestContext.requestId"
-      cond         = "$.detail.requestContext.condition"
-      retries      = "$.detail.requestContext.approximateInvokeCount"
-      status       = "$.detail.responseContext.statusCode"
-      errorType    = "$.detail.responseContext.functionError"
-      errorMessage = "$.detail.responsePayload.errorMessage"
-      ts           = "$.time"
-      region       = "$.region"
-    }
-    input_template = "\"*:x: Lambda非同期失敗*\\n*関数*: <fnArn>\\n*RequestId*: <reqId>\\n*条件*: <cond> / *試行回数*: <retries>\\n*エラー*: <errorType> (<status>)\\n*メッセージ*: <errorMessage>\\n*時刻*: <ts> (<region>)\""
-  }
-}
+// 非同期失敗（EventBridge 経由）通知は削除済み
 
 ##############################################################
 # （任意）ErrorRate アラーム（Metric Math）
