@@ -30,18 +30,10 @@ variable "ecr_repository_name" {
   default = "lambda-sample"
 }
 
-# Slack (Amazon Q Developer in chat applications)
-variable "slack_channel_id" {
-  type = string # 例: "C0GHJKLMN"
-}
-
-variable "slack_team_id" {
-  type = string # 例: "T0ABCDEF"（Workspace/Team ID）
-}
-
-variable "manage_chatbot" {
-  type    = bool
-  default = true # 既存チャネル設定がある場合は false にして手動で SNS を追加 or import
+variable "slack_webhook_url" {
+  type      = string
+  sensitive = true
+  description = "Slack Incoming Webhook URL (do not commit real values)"
 }
 
 # SNS
@@ -65,4 +57,3 @@ variable "error_rate_threshold_percent" {
   type    = number
   default = 5
 }
-

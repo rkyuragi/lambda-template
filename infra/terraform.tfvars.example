@@ -3,7 +3,6 @@ lambda_function_name = "lambda-sample-image"
 ecr_repository_name  = "lambda-sample"
 image_tag            = "v1"
 
-slack_channel_id   = "C0GHJKLMN"
-slack_team_id      = "T0ABCDEF"
+slack_webhook_url = "https://hooks.slack.com/services/xxx/yyy/zzz" # 実値は漏らさないこと
 
 sns_topic_name = "lambda-alerts"
