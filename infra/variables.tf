@@ -19,8 +19,9 @@ variable "architecture" {
   default = "arm64" # x86_64 も可
 }
 
-variable "image_uri" {
-  type = string # Makefile の print-image-uri で取得・設定
+variable "image_tag" {
+  type    = string
+  default = "v1"
 }
 
 # ECR（任意：Terraform で管理する場合）
@@ -63,4 +64,12 @@ variable "alarm_evaluation_periods" {
 variable "error_rate_threshold_percent" {
   type    = number
   default = 5
+}
+
+# アラーム通知の経路
+# true: EventBridge 経由で整形して SNS/Slack（CloudWatch アラーム側の通知は未設定に見える）
+# false: CloudWatch アラームの通知に SNS を直接設定（コンソール上で「通知あり」になる）
+variable "alarm_use_eventbridge_formatting" {
+  type    = bool
+  default = true
 }

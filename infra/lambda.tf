@@ -1,8 +1,21 @@
-# コンテナイメージの Lambda
+data "aws_ecr_repository" "repo" {
+  name = var.ecr_repository_name
+}
+
+data "aws_ecr_image" "img" {
+  repository_name = data.aws_ecr_repository.repo.name
+  image_tag       = var.image_tag
+}
+
+locals {
+  image_uri_resolved = "${data.aws_ecr_repository.repo.repository_url}@${data.aws_ecr_image.img.image_digest}"
+}
+
+# コンテナイメージの Lambda（ダイジェスト固定）
 resource "aws_lambda_function" "this" {
   function_name = var.lambda_function_name
   package_type  = "Image"
-  image_uri     = var.image_uri
+  image_uri     = local.image_uri_resolved
 
   role          = aws_iam_role.lambda.arn
   architectures = [var.architecture]
@@ -26,4 +39,3 @@ resource "aws_lambda_function_event_invoke_config" "async" {
   maximum_retry_attempts       = 2
   maximum_event_age_in_seconds = 21600
 }
-

@@ -6,8 +6,7 @@ COPY src/lambda_sample/requirements.txt ${LAMBDA_TASK_ROOT}/requirements.txt
 RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt
 
 # コード配置（パッケージとして配置し、モジュール `lambda_sample.handler` を参照）
-COPY src/lambda_sample/ ${LAMBDA_TASK_ROOT}/lambda_sample/
+COPY src/lambda_sample/ ${LAMBDA_TASK_ROOT}/
 
 # ハンドラ指定
-CMD ["lambda_sample.handler"]
-
+CMD ["handler.handler"]

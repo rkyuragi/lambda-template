@@ -14,10 +14,14 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   treat_missing_data  = "notBreaching"
 
   dimensions = { FunctionName = var.lambda_function_name }
+
+  # 直接SNSへ通知する場合のみ設定（コンソール上で「通知あり」表示）
+  alarm_actions = var.alarm_use_eventbridge_formatting ? [] : [aws_sns_topic.alerts.arn]
 }
 
 # アラーム状態遷移（ALARM）のイベントをキャッチ
 resource "aws_cloudwatch_event_rule" "cw_alarm_state_alarm" {
+  count        = var.alarm_use_eventbridge_formatting ? 1 : 0
   name         = "${var.project}-cw-alarm-state"
   description  = "CloudWatch Alarm State Change (ALARM only)"
   event_pattern = jsonencode({
@@ -30,8 +34,9 @@ resource "aws_cloudwatch_event_rule" "cw_alarm_state_alarm" {
 
 # Slack へ整形して通知（SNS ターゲット＋Input Transformer）
 resource "aws_cloudwatch_event_target" "cw_alarm_to_sns" {
-  rule = aws_cloudwatch_event_rule.cw_alarm_state_alarm.name
-  arn  = aws_sns_topic.alerts.arn
+  count = var.alarm_use_eventbridge_formatting ? 1 : 0
+  rule  = aws_cloudwatch_event_rule.cw_alarm_state_alarm[0].name
+  arn   = aws_sns_topic.alerts.arn
 
   input_transformer {
     input_paths = {
