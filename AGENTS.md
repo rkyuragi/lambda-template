@@ -44,3 +44,4 @@ If no Makefile: Node – `npm ci && npm test`; Python – `pip install -r requir
 - Follow this AGENTS.md across the repo scope; keep changes minimal and localized.
 - Do not add licenses/headers; avoid broad refactors unless requested.
 - When adding files, use the structure above and include/update tests.
+- Codexによる以降のやり取りおよびアウトプットは日本語で行うこと。
