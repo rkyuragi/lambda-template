@@ -1,6 +1,8 @@
 import json
 import sys
 
+import pytest
+
 sys.path.append(".")
 from src.lambda_sample.handler import handler
 
@@ -18,3 +20,9 @@ def test_handler_ok():
     body = json.loads(resp["body"]) if isinstance(resp.get("body"), str) else resp["body"]
     assert body.get("ok") is True
 
+
+def test_handler_forced_memory_error(monkeypatch):
+    monkeypatch.setenv("FORCE_MEMORY_LEAK", "1")
+
+    with pytest.raises(MemoryError):
+        handler(event={}, context=_Ctx())

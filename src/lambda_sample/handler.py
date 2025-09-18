@@ -23,6 +23,14 @@ def handler(event, context):
         logger.error("FORCE_ERROR=1 のため意図的にエラーを発生させます")
         raise RuntimeError("FORCED_ERROR: 意図的にエラーを発生")
 
+    if os.getenv("FORCE_MEMORY_LEAK") == "1":
+        logger.error("FORCE_MEMORY_LEAK=1 のため意図的にメモリエラーを発生させます")
+        leak = []
+        for _ in range(20):  # 約500MBx20を確保してメモリ逼迫を再現
+            leak.append(bytearray(500 * 1024 * 1024))
+        del leak
+        raise MemoryError("FORCED_MEMORY_LEAK: 意図的にメモリエラーを発生")
+
     request_id = getattr(context, "aws_request_id", None)
     if request_id:
         tracer.put_metadata(key="aws_request_id", value=request_id)

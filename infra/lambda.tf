@@ -26,6 +26,7 @@ resource "aws_lambda_function" "this" {
     variables = {
       FORCE_ERROR   = "0"
       FORCE_TIMEOUT = "0"
+      FORCE_MEMORY_LEAK = "0"
     }
   }
 }
