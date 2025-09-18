@@ -1,4 +1,7 @@
 import json
+import sys
+
+sys.path.append(".")
 from src.notify_slack import handler as h
 
 
